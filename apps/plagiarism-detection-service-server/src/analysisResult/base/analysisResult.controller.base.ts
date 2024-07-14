@@ -16,17 +16,35 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
+import * as nestAccessControl from "nest-access-control";
+import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { AnalysisResultService } from "../analysisResult.service";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { AnalysisResultCreateInput } from "./AnalysisResultCreateInput";
 import { AnalysisResult } from "./AnalysisResult";
 import { AnalysisResultFindManyArgs } from "./AnalysisResultFindManyArgs";
 import { AnalysisResultWhereUniqueInput } from "./AnalysisResultWhereUniqueInput";
 import { AnalysisResultUpdateInput } from "./AnalysisResultUpdateInput";
 
+@swagger.ApiBearerAuth()
+@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
 export class AnalysisResultControllerBase {
-  constructor(protected readonly service: AnalysisResultService) {}
+  constructor(
+    protected readonly service: AnalysisResultService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: AnalysisResult })
+  @nestAccessControl.UseRoles({
+    resource: "AnalysisResult",
+    action: "create",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async createAnalysisResult(
     @common.Body() data: AnalysisResultCreateInput
   ): Promise<AnalysisResult> {
@@ -55,9 +73,18 @@ export class AnalysisResultControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [AnalysisResult] })
   @ApiNestedQuery(AnalysisResultFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "AnalysisResult",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async analysisResults(
     @common.Req() request: Request
   ): Promise<AnalysisResult[]> {
@@ -79,9 +106,18 @@ export class AnalysisResultControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: AnalysisResult })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "AnalysisResult",
+    action: "read",
+    possession: "own",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async analysisResult(
     @common.Param() params: AnalysisResultWhereUniqueInput
   ): Promise<AnalysisResult | null> {
@@ -108,9 +144,18 @@ export class AnalysisResultControllerBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: AnalysisResult })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "AnalysisResult",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async updateAnalysisResult(
     @common.Param() params: AnalysisResultWhereUniqueInput,
     @common.Body() data: AnalysisResultUpdateInput
@@ -153,6 +198,14 @@ export class AnalysisResultControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: AnalysisResult })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "AnalysisResult",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async deleteAnalysisResult(
     @common.Param() params: AnalysisResultWhereUniqueInput
   ): Promise<AnalysisResult | null> {

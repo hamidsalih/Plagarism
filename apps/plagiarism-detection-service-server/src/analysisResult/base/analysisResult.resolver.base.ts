@@ -13,6 +13,12 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
+import * as nestAccessControl from "nest-access-control";
+import * as gqlACGuard from "../../auth/gqlAC.guard";
+import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
+import * as common from "@nestjs/common";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AnalysisResult } from "./AnalysisResult";
 import { AnalysisResultCountArgs } from "./AnalysisResultCountArgs";
 import { AnalysisResultFindManyArgs } from "./AnalysisResultFindManyArgs";
@@ -22,10 +28,20 @@ import { UpdateAnalysisResultArgs } from "./UpdateAnalysisResultArgs";
 import { DeleteAnalysisResultArgs } from "./DeleteAnalysisResultArgs";
 import { Document } from "../../document/base/Document";
 import { AnalysisResultService } from "../analysisResult.service";
+@common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => AnalysisResult)
 export class AnalysisResultResolverBase {
-  constructor(protected readonly service: AnalysisResultService) {}
+  constructor(
+    protected readonly service: AnalysisResultService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
 
+  @graphql.Query(() => MetaQueryPayload)
+  @nestAccessControl.UseRoles({
+    resource: "AnalysisResult",
+    action: "read",
+    possession: "any",
+  })
   async _analysisResultsMeta(
     @graphql.Args() args: AnalysisResultCountArgs
   ): Promise<MetaQueryPayload> {
@@ -35,14 +51,26 @@ export class AnalysisResultResolverBase {
     };
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [AnalysisResult])
+  @nestAccessControl.UseRoles({
+    resource: "AnalysisResult",
+    action: "read",
+    possession: "any",
+  })
   async analysisResults(
     @graphql.Args() args: AnalysisResultFindManyArgs
   ): Promise<AnalysisResult[]> {
     return this.service.analysisResults(args);
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => AnalysisResult, { nullable: true })
+  @nestAccessControl.UseRoles({
+    resource: "AnalysisResult",
+    action: "read",
+    possession: "own",
+  })
   async analysisResult(
     @graphql.Args() args: AnalysisResultFindUniqueArgs
   ): Promise<AnalysisResult | null> {
@@ -53,7 +81,13 @@ export class AnalysisResultResolverBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => AnalysisResult)
+  @nestAccessControl.UseRoles({
+    resource: "AnalysisResult",
+    action: "create",
+    possession: "any",
+  })
   async createAnalysisResult(
     @graphql.Args() args: CreateAnalysisResultArgs
   ): Promise<AnalysisResult> {
@@ -71,7 +105,13 @@ export class AnalysisResultResolverBase {
     });
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => AnalysisResult)
+  @nestAccessControl.UseRoles({
+    resource: "AnalysisResult",
+    action: "update",
+    possession: "any",
+  })
   async updateAnalysisResult(
     @graphql.Args() args: UpdateAnalysisResultArgs
   ): Promise<AnalysisResult | null> {
@@ -99,6 +139,11 @@ export class AnalysisResultResolverBase {
   }
 
   @graphql.Mutation(() => AnalysisResult)
+  @nestAccessControl.UseRoles({
+    resource: "AnalysisResult",
+    action: "delete",
+    possession: "any",
+  })
   async deleteAnalysisResult(
     @graphql.Args() args: DeleteAnalysisResultArgs
   ): Promise<AnalysisResult | null> {
@@ -114,9 +159,15 @@ export class AnalysisResultResolverBase {
     }
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => Document, {
     nullable: true,
     name: "document",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "read",
+    possession: "any",
   })
   async getDocument(
     @graphql.Parent() parent: AnalysisResult

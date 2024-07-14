@@ -16,7 +16,11 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
+import * as nestAccessControl from "nest-access-control";
+import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { DocumentService } from "../document.service";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { DocumentCreateInput } from "./DocumentCreateInput";
 import { Document } from "./Document";
 import { DocumentFindManyArgs } from "./DocumentFindManyArgs";
@@ -26,10 +30,24 @@ import { AnalysisResultFindManyArgs } from "../../analysisResult/base/AnalysisRe
 import { AnalysisResult } from "../../analysisResult/base/AnalysisResult";
 import { AnalysisResultWhereUniqueInput } from "../../analysisResult/base/AnalysisResultWhereUniqueInput";
 
+@swagger.ApiBearerAuth()
+@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
 export class DocumentControllerBase {
-  constructor(protected readonly service: DocumentService) {}
+  constructor(
+    protected readonly service: DocumentService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: Document })
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "create",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async createDocument(
     @common.Body() data: DocumentCreateInput
   ): Promise<Document> {
@@ -46,9 +64,18 @@ export class DocumentControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [Document] })
   @ApiNestedQuery(DocumentFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async documents(@common.Req() request: Request): Promise<Document[]> {
     const args = plainToClass(DocumentFindManyArgs, request.query);
     return this.service.documents({
@@ -64,9 +91,18 @@ export class DocumentControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: Document })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "read",
+    possession: "own",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async document(
     @common.Param() params: DocumentWhereUniqueInput
   ): Promise<Document | null> {
@@ -89,9 +125,18 @@ export class DocumentControllerBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: Document })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async updateDocument(
     @common.Param() params: DocumentWhereUniqueInput,
     @common.Body() data: DocumentUpdateInput
@@ -122,6 +167,14 @@ export class DocumentControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: Document })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async deleteDocument(
     @common.Param() params: DocumentWhereUniqueInput
   ): Promise<Document | null> {
@@ -147,8 +200,14 @@ export class DocumentControllerBase {
     }
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/analysisResults")
   @ApiNestedQuery(AnalysisResultFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "AnalysisResult",
+    action: "read",
+    possession: "any",
+  })
   async findAnalysisResults(
     @common.Req() request: Request,
     @common.Param() params: DocumentWhereUniqueInput
@@ -178,6 +237,11 @@ export class DocumentControllerBase {
   }
 
   @common.Post("/:id/analysisResults")
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "update",
+    possession: "any",
+  })
   async connectAnalysisResults(
     @common.Param() params: DocumentWhereUniqueInput,
     @common.Body() body: AnalysisResultWhereUniqueInput[]
@@ -195,6 +259,11 @@ export class DocumentControllerBase {
   }
 
   @common.Patch("/:id/analysisResults")
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "update",
+    possession: "any",
+  })
   async updateAnalysisResults(
     @common.Param() params: DocumentWhereUniqueInput,
     @common.Body() body: AnalysisResultWhereUniqueInput[]
@@ -212,6 +281,11 @@ export class DocumentControllerBase {
   }
 
   @common.Delete("/:id/analysisResults")
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "update",
+    possession: "any",
+  })
   async disconnectAnalysisResults(
     @common.Param() params: DocumentWhereUniqueInput,
     @common.Body() body: AnalysisResultWhereUniqueInput[]

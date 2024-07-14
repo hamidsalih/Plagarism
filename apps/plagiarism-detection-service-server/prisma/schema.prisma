@@ -34,9 +34,27 @@ model Algorithm {
 }
 
 model User {
-  id        String  @id @default(cuid())
+  id        String          @id @default(cuid())
   firstName String?
   lastName  String?
   email     String?
   password  String?
+  username  String?
+  roles     EnumUserRoles[]
+}
+
+model Check {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Report {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum EnumUserRoles {
+  Option1
 }

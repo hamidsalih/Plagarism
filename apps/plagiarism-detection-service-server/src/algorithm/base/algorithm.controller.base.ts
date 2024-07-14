@@ -16,17 +16,35 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
+import * as nestAccessControl from "nest-access-control";
+import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { AlgorithmService } from "../algorithm.service";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { AlgorithmCreateInput } from "./AlgorithmCreateInput";
 import { Algorithm } from "./Algorithm";
 import { AlgorithmFindManyArgs } from "./AlgorithmFindManyArgs";
 import { AlgorithmWhereUniqueInput } from "./AlgorithmWhereUniqueInput";
 import { AlgorithmUpdateInput } from "./AlgorithmUpdateInput";
 
+@swagger.ApiBearerAuth()
+@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
 export class AlgorithmControllerBase {
-  constructor(protected readonly service: AlgorithmService) {}
+  constructor(
+    protected readonly service: AlgorithmService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: Algorithm })
+  @nestAccessControl.UseRoles({
+    resource: "Algorithm",
+    action: "create",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async createAlgorithm(
     @common.Body() data: AlgorithmCreateInput
   ): Promise<Algorithm> {
@@ -41,9 +59,18 @@ export class AlgorithmControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [Algorithm] })
   @ApiNestedQuery(AlgorithmFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Algorithm",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async algorithms(@common.Req() request: Request): Promise<Algorithm[]> {
     const args = plainToClass(AlgorithmFindManyArgs, request.query);
     return this.service.algorithms({
@@ -57,9 +84,18 @@ export class AlgorithmControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: Algorithm })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "Algorithm",
+    action: "read",
+    possession: "own",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async algorithm(
     @common.Param() params: AlgorithmWhereUniqueInput
   ): Promise<Algorithm | null> {
@@ -80,9 +116,18 @@ export class AlgorithmControllerBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: Algorithm })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "Algorithm",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async updateAlgorithm(
     @common.Param() params: AlgorithmWhereUniqueInput,
     @common.Body() data: AlgorithmUpdateInput
@@ -111,6 +156,14 @@ export class AlgorithmControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: Algorithm })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "Algorithm",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async deleteAlgorithm(
     @common.Param() params: AlgorithmWhereUniqueInput
   ): Promise<Algorithm | null> {

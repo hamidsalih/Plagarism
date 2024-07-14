@@ -21,6 +21,14 @@ import { UserList } from "./user/UserList";
 import { UserCreate } from "./user/UserCreate";
 import { UserEdit } from "./user/UserEdit";
 import { UserShow } from "./user/UserShow";
+import { CheckList } from "./check/CheckList";
+import { CheckCreate } from "./check/CheckCreate";
+import { CheckEdit } from "./check/CheckEdit";
+import { CheckShow } from "./check/CheckShow";
+import { ReportList } from "./report/ReportList";
+import { ReportCreate } from "./report/ReportCreate";
+import { ReportEdit } from "./report/ReportEdit";
+import { ReportShow } from "./report/ReportShow";
 import { jwtAuthProvider } from "./auth-provider/ra-auth-jwt";
 
 const App = (): React.ReactElement => {
@@ -74,6 +82,20 @@ const App = (): React.ReactElement => {
           edit={UserEdit}
           create={UserCreate}
           show={UserShow}
+        />
+        <Resource
+          name="Check"
+          list={CheckList}
+          edit={CheckEdit}
+          create={CheckCreate}
+          show={CheckShow}
+        />
+        <Resource
+          name="Report"
+          list={ReportList}
+          edit={ReportEdit}
+          create={ReportCreate}
+          show={ReportShow}
         />
       </Admin>
     </div>

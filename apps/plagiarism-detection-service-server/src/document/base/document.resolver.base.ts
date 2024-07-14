@@ -13,6 +13,12 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
+import * as nestAccessControl from "nest-access-control";
+import * as gqlACGuard from "../../auth/gqlAC.guard";
+import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
+import * as common from "@nestjs/common";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { Document } from "./Document";
 import { DocumentCountArgs } from "./DocumentCountArgs";
 import { DocumentFindManyArgs } from "./DocumentFindManyArgs";
@@ -23,10 +29,20 @@ import { DeleteDocumentArgs } from "./DeleteDocumentArgs";
 import { AnalysisResultFindManyArgs } from "../../analysisResult/base/AnalysisResultFindManyArgs";
 import { AnalysisResult } from "../../analysisResult/base/AnalysisResult";
 import { DocumentService } from "../document.service";
+@common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Document)
 export class DocumentResolverBase {
-  constructor(protected readonly service: DocumentService) {}
+  constructor(
+    protected readonly service: DocumentService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
 
+  @graphql.Query(() => MetaQueryPayload)
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "read",
+    possession: "any",
+  })
   async _documentsMeta(
     @graphql.Args() args: DocumentCountArgs
   ): Promise<MetaQueryPayload> {
@@ -36,14 +52,26 @@ export class DocumentResolverBase {
     };
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [Document])
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "read",
+    possession: "any",
+  })
   async documents(
     @graphql.Args() args: DocumentFindManyArgs
   ): Promise<Document[]> {
     return this.service.documents(args);
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => Document, { nullable: true })
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "read",
+    possession: "own",
+  })
   async document(
     @graphql.Args() args: DocumentFindUniqueArgs
   ): Promise<Document | null> {
@@ -54,7 +82,13 @@ export class DocumentResolverBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Document)
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "create",
+    possession: "any",
+  })
   async createDocument(
     @graphql.Args() args: CreateDocumentArgs
   ): Promise<Document> {
@@ -64,7 +98,13 @@ export class DocumentResolverBase {
     });
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Document)
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "update",
+    possession: "any",
+  })
   async updateDocument(
     @graphql.Args() args: UpdateDocumentArgs
   ): Promise<Document | null> {
@@ -84,6 +124,11 @@ export class DocumentResolverBase {
   }
 
   @graphql.Mutation(() => Document)
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "delete",
+    possession: "any",
+  })
   async deleteDocument(
     @graphql.Args() args: DeleteDocumentArgs
   ): Promise<Document | null> {
@@ -99,7 +144,13 @@ export class DocumentResolverBase {
     }
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [AnalysisResult], { name: "analysisResults" })
+  @nestAccessControl.UseRoles({
+    resource: "AnalysisResult",
+    action: "read",
+    possession: "any",
+  })
   async findAnalysisResults(
     @graphql.Parent() parent: Document,
     @graphql.Args() args: AnalysisResultFindManyArgs

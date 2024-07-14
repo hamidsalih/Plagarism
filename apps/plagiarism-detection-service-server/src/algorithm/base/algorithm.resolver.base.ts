@@ -13,6 +13,12 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
+import * as nestAccessControl from "nest-access-control";
+import * as gqlACGuard from "../../auth/gqlAC.guard";
+import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
+import * as common from "@nestjs/common";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { Algorithm } from "./Algorithm";
 import { AlgorithmCountArgs } from "./AlgorithmCountArgs";
 import { AlgorithmFindManyArgs } from "./AlgorithmFindManyArgs";
@@ -21,10 +27,20 @@ import { CreateAlgorithmArgs } from "./CreateAlgorithmArgs";
 import { UpdateAlgorithmArgs } from "./UpdateAlgorithmArgs";
 import { DeleteAlgorithmArgs } from "./DeleteAlgorithmArgs";
 import { AlgorithmService } from "../algorithm.service";
+@common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Algorithm)
 export class AlgorithmResolverBase {
-  constructor(protected readonly service: AlgorithmService) {}
+  constructor(
+    protected readonly service: AlgorithmService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
 
+  @graphql.Query(() => MetaQueryPayload)
+  @nestAccessControl.UseRoles({
+    resource: "Algorithm",
+    action: "read",
+    possession: "any",
+  })
   async _algorithmsMeta(
     @graphql.Args() args: AlgorithmCountArgs
   ): Promise<MetaQueryPayload> {
@@ -34,14 +50,26 @@ export class AlgorithmResolverBase {
     };
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [Algorithm])
+  @nestAccessControl.UseRoles({
+    resource: "Algorithm",
+    action: "read",
+    possession: "any",
+  })
   async algorithms(
     @graphql.Args() args: AlgorithmFindManyArgs
   ): Promise<Algorithm[]> {
     return this.service.algorithms(args);
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => Algorithm, { nullable: true })
+  @nestAccessControl.UseRoles({
+    resource: "Algorithm",
+    action: "read",
+    possession: "own",
+  })
   async algorithm(
     @graphql.Args() args: AlgorithmFindUniqueArgs
   ): Promise<Algorithm | null> {
@@ -52,7 +80,13 @@ export class AlgorithmResolverBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Algorithm)
+  @nestAccessControl.UseRoles({
+    resource: "Algorithm",
+    action: "create",
+    possession: "any",
+  })
   async createAlgorithm(
     @graphql.Args() args: CreateAlgorithmArgs
   ): Promise<Algorithm> {
@@ -62,7 +96,13 @@ export class AlgorithmResolverBase {
     });
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Algorithm)
+  @nestAccessControl.UseRoles({
+    resource: "Algorithm",
+    action: "update",
+    possession: "any",
+  })
   async updateAlgorithm(
     @graphql.Args() args: UpdateAlgorithmArgs
   ): Promise<Algorithm | null> {
@@ -82,6 +122,11 @@ export class AlgorithmResolverBase {
   }
 
   @graphql.Mutation(() => Algorithm)
+  @nestAccessControl.UseRoles({
+    resource: "Algorithm",
+    action: "delete",
+    possession: "any",
+  })
   async deleteAlgorithm(
     @graphql.Args() args: DeleteAlgorithmArgs
   ): Promise<Algorithm | null> {
