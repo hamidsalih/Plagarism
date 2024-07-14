@@ -24,6 +24,10 @@ const CREATE_INPUT = {
   title: "exampleTitle",
   content: "exampleContent",
   uploadedAt: new Date(),
+  uploadedBy: "exampleUploadedBy",
+  documentContent: "exampleDocumentContent",
+  uploadedByUser: "exampleUploadedByUser",
+  documentTitle: "exampleDocumentTitle",
 };
 const CREATE_RESULT = {
   id: "exampleId",
@@ -32,6 +36,10 @@ const CREATE_RESULT = {
   title: "exampleTitle",
   content: "exampleContent",
   uploadedAt: new Date(),
+  uploadedBy: "exampleUploadedBy",
+  documentContent: "exampleDocumentContent",
+  uploadedByUser: "exampleUploadedByUser",
+  documentTitle: "exampleDocumentTitle",
 };
 const FIND_MANY_RESULT = [
   {
@@ -41,6 +49,10 @@ const FIND_MANY_RESULT = [
     title: "exampleTitle",
     content: "exampleContent",
     uploadedAt: new Date(),
+    uploadedBy: "exampleUploadedBy",
+    documentContent: "exampleDocumentContent",
+    uploadedByUser: "exampleUploadedByUser",
+    documentTitle: "exampleDocumentTitle",
   },
 ];
 const FIND_ONE_RESULT = {
@@ -50,6 +62,10 @@ const FIND_ONE_RESULT = {
   title: "exampleTitle",
   content: "exampleContent",
   uploadedAt: new Date(),
+  uploadedBy: "exampleUploadedBy",
+  documentContent: "exampleDocumentContent",
+  uploadedByUser: "exampleUploadedByUser",
+  documentTitle: "exampleDocumentTitle",
 };
 
 const service = {

@@ -23,6 +23,7 @@ export const UserCreate = (props: CreateProps): React.ReactElement => {
           optionText="label"
           optionValue="value"
         />
+        <TextInput label="userEmail" source="userEmail" type="email" />
       </SimpleForm>
     </Create>
   );

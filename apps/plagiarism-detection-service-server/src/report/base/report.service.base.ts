@@ -10,7 +10,11 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-import { Prisma, Report as PrismaReport } from "@prisma/client";
+import {
+  Prisma,
+  Report as PrismaReport,
+  Document as PrismaDocument,
+} from "@prisma/client";
 import { ReportDto } from "../ReportDto";
 
 export class ReportServiceBase {
@@ -36,6 +40,14 @@ export class ReportServiceBase {
   }
   async deleteReport(args: Prisma.ReportDeleteArgs): Promise<PrismaReport> {
     return this.prisma.report.delete(args);
+  }
+
+  async getDocument(parentId: string): Promise<PrismaDocument | null> {
+    return this.prisma.report
+      .findUnique({
+        where: { id: parentId },
+      })
+      .document();
   }
   async CreateReport(args: ReportDto): Promise<ReportDto> {
     throw new Error("Not implemented");

@@ -20,6 +20,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { AnalysisResultUpdateManyWithoutDocumentsInput } from "./AnalysisResultUpdateManyWithoutDocumentsInput";
+import { ReportUpdateManyWithoutDocumentsInput } from "./ReportUpdateManyWithoutDocumentsInput";
 
 @InputType()
 class DocumentUpdateInput {
@@ -69,6 +70,66 @@ class DocumentUpdateInput {
     nullable: true,
   })
   analysisResults?: AnalysisResultUpdateManyWithoutDocumentsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  uploadedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ReportUpdateManyWithoutDocumentsInput,
+  })
+  @ValidateNested()
+  @Type(() => ReportUpdateManyWithoutDocumentsInput)
+  @IsOptional()
+  @Field(() => ReportUpdateManyWithoutDocumentsInput, {
+    nullable: true,
+  })
+  reports?: ReportUpdateManyWithoutDocumentsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  documentContent?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  uploadedByUser?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  documentTitle?: string | null;
 }
 
 export { DocumentUpdateInput as DocumentUpdateInput };

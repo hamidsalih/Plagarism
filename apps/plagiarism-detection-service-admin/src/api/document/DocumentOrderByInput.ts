@@ -7,4 +7,8 @@ export type DocumentOrderByInput = {
   title?: SortOrder;
   content?: SortOrder;
   uploadedAt?: SortOrder;
+  uploadedBy?: SortOrder;
+  documentContent?: SortOrder;
+  uploadedByUser?: SortOrder;
+  documentTitle?: SortOrder;
 };

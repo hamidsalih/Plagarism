@@ -17,6 +17,7 @@ import { IsOptional, ValidateNested } from "class-validator";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { DateTimeNullableFilter } from "../../util/DateTimeNullableFilter";
 import { AnalysisResultListRelationFilter } from "../../analysisResult/base/AnalysisResultListRelationFilter";
+import { ReportListRelationFilter } from "../../report/base/ReportListRelationFilter";
 
 @InputType()
 class DocumentWhereInput {
@@ -75,6 +76,62 @@ class DocumentWhereInput {
     nullable: true,
   })
   analysisResults?: AnalysisResultListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  uploadedBy?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => ReportListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => ReportListRelationFilter)
+  @IsOptional()
+  @Field(() => ReportListRelationFilter, {
+    nullable: true,
+  })
+  reports?: ReportListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  documentContent?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  uploadedByUser?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  documentTitle?: StringNullableFilter;
 }
 
 export { DocumentWhereInput as DocumentWhereInput };

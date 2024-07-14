@@ -9,5 +9,51 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-class ReportCreateInput {}
+import { InputType, Field } from "@nestjs/graphql";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsJSONValue } from "../../validators";
+import { IsOptional, IsInt, Min, Max, ValidateNested } from "class-validator";
+import { GraphQLJSON } from "graphql-type-json";
+import { InputJsonValue } from "../../types";
+import { DocumentWhereUniqueInput } from "../../document/base/DocumentWhereUniqueInput";
+import { Type } from "class-transformer";
+
+@InputType()
+class ReportCreateInput {
+  @ApiProperty({
+    required: false,
+  })
+  @IsJSONValue()
+  @IsOptional()
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+  })
+  analysis?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @Min(-999999999)
+  @Max(999999999)
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  similarityScore?: number | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => DocumentWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => DocumentWhereUniqueInput)
+  @IsOptional()
+  @Field(() => DocumentWhereUniqueInput, {
+    nullable: true,
+  })
+  document?: DocumentWhereUniqueInput | null;
+}
+
 export { ReportCreateInput as ReportCreateInput };

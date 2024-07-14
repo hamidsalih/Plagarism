@@ -29,6 +29,22 @@ import { ReportList } from "./report/ReportList";
 import { ReportCreate } from "./report/ReportCreate";
 import { ReportEdit } from "./report/ReportEdit";
 import { ReportShow } from "./report/ReportShow";
+import { PlagiarismDocumentList } from "./plagiarismDocument/PlagiarismDocumentList";
+import { PlagiarismDocumentCreate } from "./plagiarismDocument/PlagiarismDocumentCreate";
+import { PlagiarismDocumentEdit } from "./plagiarismDocument/PlagiarismDocumentEdit";
+import { PlagiarismDocumentShow } from "./plagiarismDocument/PlagiarismDocumentShow";
+import { PlagiarismAlgorithmList } from "./plagiarismAlgorithm/PlagiarismAlgorithmList";
+import { PlagiarismAlgorithmCreate } from "./plagiarismAlgorithm/PlagiarismAlgorithmCreate";
+import { PlagiarismAlgorithmEdit } from "./plagiarismAlgorithm/PlagiarismAlgorithmEdit";
+import { PlagiarismAlgorithmShow } from "./plagiarismAlgorithm/PlagiarismAlgorithmShow";
+import { PlagiarismUserList } from "./plagiarismUser/PlagiarismUserList";
+import { PlagiarismUserCreate } from "./plagiarismUser/PlagiarismUserCreate";
+import { PlagiarismUserEdit } from "./plagiarismUser/PlagiarismUserEdit";
+import { PlagiarismUserShow } from "./plagiarismUser/PlagiarismUserShow";
+import { PlagiarismReportList } from "./plagiarismReport/PlagiarismReportList";
+import { PlagiarismReportCreate } from "./plagiarismReport/PlagiarismReportCreate";
+import { PlagiarismReportEdit } from "./plagiarismReport/PlagiarismReportEdit";
+import { PlagiarismReportShow } from "./plagiarismReport/PlagiarismReportShow";
 import { jwtAuthProvider } from "./auth-provider/ra-auth-jwt";
 
 const App = (): React.ReactElement => {
@@ -96,6 +112,34 @@ const App = (): React.ReactElement => {
           edit={ReportEdit}
           create={ReportCreate}
           show={ReportShow}
+        />
+        <Resource
+          name="PlagiarismDocument"
+          list={PlagiarismDocumentList}
+          edit={PlagiarismDocumentEdit}
+          create={PlagiarismDocumentCreate}
+          show={PlagiarismDocumentShow}
+        />
+        <Resource
+          name="PlagiarismAlgorithm"
+          list={PlagiarismAlgorithmList}
+          edit={PlagiarismAlgorithmEdit}
+          create={PlagiarismAlgorithmCreate}
+          show={PlagiarismAlgorithmShow}
+        />
+        <Resource
+          name="PlagiarismUser"
+          list={PlagiarismUserList}
+          edit={PlagiarismUserEdit}
+          create={PlagiarismUserCreate}
+          show={PlagiarismUserShow}
+        />
+        <Resource
+          name="PlagiarismReport"
+          list={PlagiarismReportList}
+          edit={PlagiarismReportEdit}
+          create={PlagiarismReportCreate}
+          show={PlagiarismReportShow}
         />
       </Admin>
     </div>

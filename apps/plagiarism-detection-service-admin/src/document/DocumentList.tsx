@@ -18,6 +18,10 @@ export const DocumentList = (props: ListProps): React.ReactElement => {
         <TextField label="title" source="title" />
         <TextField label="content" source="content" />
         <TextField label="uploadedAt" source="uploadedAt" />
+        <TextField label="uploadedBy" source="uploadedBy" />
+        <TextField label="documentContent" source="documentContent" />
+        <TextField label="uploadedByUser" source="uploadedByUser" />
+        <TextField label="documentTitle" source="documentTitle" />
       </Datagrid>
     </List>
   );

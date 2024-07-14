@@ -28,6 +28,8 @@ import { UpdateDocumentArgs } from "./UpdateDocumentArgs";
 import { DeleteDocumentArgs } from "./DeleteDocumentArgs";
 import { AnalysisResultFindManyArgs } from "../../analysisResult/base/AnalysisResultFindManyArgs";
 import { AnalysisResult } from "../../analysisResult/base/AnalysisResult";
+import { ReportFindManyArgs } from "../../report/base/ReportFindManyArgs";
+import { Report } from "../../report/base/Report";
 import { DocumentService } from "../document.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Document)
@@ -156,6 +158,26 @@ export class DocumentResolverBase {
     @graphql.Args() args: AnalysisResultFindManyArgs
   ): Promise<AnalysisResult[]> {
     const results = await this.service.findAnalysisResults(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Report], { name: "reports" })
+  @nestAccessControl.UseRoles({
+    resource: "Report",
+    action: "read",
+    possession: "any",
+  })
+  async findReports(
+    @graphql.Parent() parent: Document,
+    @graphql.Args() args: ReportFindManyArgs
+  ): Promise<Report[]> {
+    const results = await this.service.findReports(parent.id, args);
 
     if (!results) {
       return [];

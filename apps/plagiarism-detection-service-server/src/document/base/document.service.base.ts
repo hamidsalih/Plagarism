@@ -10,10 +10,12 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
+
 import {
   Prisma,
   Document as PrismaDocument,
   AnalysisResult as PrismaAnalysisResult,
+  Report as PrismaReport,
 } from "@prisma/client";
 
 export class DocumentServiceBase {
@@ -58,5 +60,16 @@ export class DocumentServiceBase {
         where: { id: parentId },
       })
       .analysisResults(args);
+  }
+
+  async findReports(
+    parentId: string,
+    args: Prisma.ReportFindManyArgs
+  ): Promise<PrismaReport[]> {
+    return this.prisma.document
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .reports(args);
   }
 }

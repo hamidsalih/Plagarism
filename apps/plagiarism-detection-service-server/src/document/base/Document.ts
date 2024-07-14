@@ -20,6 +20,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { AnalysisResult } from "../../analysisResult/base/AnalysisResult";
+import { Report } from "../../report/base/Report";
 
 @ObjectType()
 class Document {
@@ -90,6 +91,63 @@ class Document {
   @Type(() => AnalysisResult)
   @IsOptional()
   analysisResults?: Array<AnalysisResult>;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  uploadedBy!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [Report],
+  })
+  @ValidateNested()
+  @Type(() => Report)
+  @IsOptional()
+  reports?: Array<Report>;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  documentContent!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  uploadedByUser!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  documentTitle!: string | null;
 }
 
 export { Document as Document };

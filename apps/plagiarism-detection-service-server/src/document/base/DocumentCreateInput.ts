@@ -20,6 +20,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { AnalysisResultCreateNestedManyWithoutDocumentsInput } from "./AnalysisResultCreateNestedManyWithoutDocumentsInput";
+import { ReportCreateNestedManyWithoutDocumentsInput } from "./ReportCreateNestedManyWithoutDocumentsInput";
 
 @InputType()
 class DocumentCreateInput {
@@ -69,6 +70,66 @@ class DocumentCreateInput {
     nullable: true,
   })
   analysisResults?: AnalysisResultCreateNestedManyWithoutDocumentsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  uploadedBy?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => ReportCreateNestedManyWithoutDocumentsInput,
+  })
+  @ValidateNested()
+  @Type(() => ReportCreateNestedManyWithoutDocumentsInput)
+  @IsOptional()
+  @Field(() => ReportCreateNestedManyWithoutDocumentsInput, {
+    nullable: true,
+  })
+  reports?: ReportCreateNestedManyWithoutDocumentsInput;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  documentContent?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  uploadedByUser?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  documentTitle?: string | null;
 }
 
 export { DocumentCreateInput as DocumentCreateInput };

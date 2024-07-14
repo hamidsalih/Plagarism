@@ -13,7 +13,10 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { StringFilter } from "../../util/StringFilter";
 import { Type } from "class-transformer";
-import { IsOptional } from "class-validator";
+import { IsOptional, ValidateNested } from "class-validator";
+import { JsonFilter } from "../../util/JsonFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { DocumentWhereUniqueInput } from "../../document/base/DocumentWhereUniqueInput";
 
 @InputType()
 class ReportWhereInput {
@@ -27,6 +30,40 @@ class ReportWhereInput {
     nullable: true,
   })
   id?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: JsonFilter,
+  })
+  @Type(() => JsonFilter)
+  @IsOptional()
+  @Field(() => JsonFilter, {
+    nullable: true,
+  })
+  analysis?: JsonFilter;
+
+  @ApiProperty({
+    required: false,
+    type: IntNullableFilter,
+  })
+  @Type(() => IntNullableFilter)
+  @IsOptional()
+  @Field(() => IntNullableFilter, {
+    nullable: true,
+  })
+  similarityScore?: IntNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => DocumentWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => DocumentWhereUniqueInput)
+  @IsOptional()
+  @Field(() => DocumentWhereUniqueInput, {
+    nullable: true,
+  })
+  document?: DocumentWhereUniqueInput;
 }
 
 export { ReportWhereInput as ReportWhereInput };

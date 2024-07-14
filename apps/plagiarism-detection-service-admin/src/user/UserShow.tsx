@@ -12,6 +12,7 @@ export const UserShow = (props: ShowProps): React.ReactElement => {
         <TextField label="password" source="password" />
         <TextField label="username" source="username" />
         <TextField label="roles" source="roles" />
+        <TextField label="userEmail" source="userEmail" />
       </SimpleShowLayout>
     </Show>
   );

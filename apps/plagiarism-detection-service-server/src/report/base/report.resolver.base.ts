@@ -18,11 +18,15 @@ import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { Report } from "./Report";
 import { ReportCountArgs } from "./ReportCountArgs";
 import { ReportFindManyArgs } from "./ReportFindManyArgs";
 import { ReportFindUniqueArgs } from "./ReportFindUniqueArgs";
+import { CreateReportArgs } from "./CreateReportArgs";
+import { UpdateReportArgs } from "./UpdateReportArgs";
 import { DeleteReportArgs } from "./DeleteReportArgs";
+import { Document } from "../../document/base/Document";
 import { ReportDto } from "../ReportDto";
 import { ReportService } from "../report.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -76,6 +80,61 @@ export class ReportResolverBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @graphql.Mutation(() => Report)
+  @nestAccessControl.UseRoles({
+    resource: "Report",
+    action: "create",
+    possession: "any",
+  })
+  async createReport(@graphql.Args() args: CreateReportArgs): Promise<Report> {
+    return await this.service.createReport({
+      ...args,
+      data: {
+        ...args.data,
+
+        document: args.data.document
+          ? {
+              connect: args.data.document,
+            }
+          : undefined,
+      },
+    });
+  }
+
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @graphql.Mutation(() => Report)
+  @nestAccessControl.UseRoles({
+    resource: "Report",
+    action: "update",
+    possession: "any",
+  })
+  async updateReport(
+    @graphql.Args() args: UpdateReportArgs
+  ): Promise<Report | null> {
+    try {
+      return await this.service.updateReport({
+        ...args,
+        data: {
+          ...args.data,
+
+          document: args.data.document
+            ? {
+                connect: args.data.document,
+              }
+            : undefined,
+        },
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
   @graphql.Mutation(() => Report)
   @nestAccessControl.UseRoles({
     resource: "Report",
@@ -95,6 +154,27 @@ export class ReportResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Document, {
+    nullable: true,
+    name: "document",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "read",
+    possession: "any",
+  })
+  async getDocument(
+    @graphql.Parent() parent: Report
+  ): Promise<Document | null> {
+    const result = await this.service.getDocument(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 
   @graphql.Mutation(() => ReportDto)

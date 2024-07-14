@@ -5,4 +5,5 @@ export type UserCreateInput = {
   password?: string | null;
   username?: string | null;
   roles?: Array<"Option1">;
+  userEmail?: string | null;
 };

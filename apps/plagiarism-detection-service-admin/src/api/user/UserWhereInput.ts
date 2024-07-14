@@ -8,4 +8,5 @@ export type UserWhereInput = {
   email?: StringNullableFilter;
   password?: StringNullableFilter;
   username?: StringNullableFilter;
+  userEmail?: StringNullableFilter;
 };

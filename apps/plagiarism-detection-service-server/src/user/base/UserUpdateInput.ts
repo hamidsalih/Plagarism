@@ -88,6 +88,17 @@ class UserUpdateInput {
     nullable: true,
   })
   roles?: Array<"Option1">;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  userEmail?: string | null;
 }
 
 export { UserUpdateInput as UserUpdateInput };

@@ -1,4 +1,5 @@
 import { AnalysisResult } from "../analysisResult/AnalysisResult";
+import { Report } from "../report/Report";
 
 export type Document = {
   id: string;
@@ -8,4 +9,9 @@ export type Document = {
   content: string | null;
   uploadedAt: Date | null;
   analysisResults?: Array<AnalysisResult>;
+  uploadedBy: string | null;
+  reports?: Array<Report>;
+  documentContent: string | null;
+  uploadedByUser: string | null;
+  documentTitle: string | null;
 };

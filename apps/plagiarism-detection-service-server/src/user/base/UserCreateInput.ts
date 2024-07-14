@@ -88,6 +88,17 @@ class UserCreateInput {
     nullable: true,
   })
   roles?: Array<"Option1">;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  userEmail?: string | null;
 }
 
 export { UserCreateInput as UserCreateInput };

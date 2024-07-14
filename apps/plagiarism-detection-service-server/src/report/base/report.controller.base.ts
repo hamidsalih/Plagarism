@@ -48,11 +48,27 @@ export class ReportControllerBase {
   })
   async createReport(@common.Body() data: ReportCreateInput): Promise<Report> {
     return await this.service.createReport({
-      data: data,
+      data: {
+        ...data,
+
+        document: data.document
+          ? {
+              connect: data.document,
+            }
+          : undefined,
+      },
       select: {
         id: true,
         createdAt: true,
         updatedAt: true,
+        analysis: true,
+        similarityScore: true,
+
+        document: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -77,6 +93,14 @@ export class ReportControllerBase {
         id: true,
         createdAt: true,
         updatedAt: true,
+        analysis: true,
+        similarityScore: true,
+
+        document: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -102,6 +126,14 @@ export class ReportControllerBase {
         id: true,
         createdAt: true,
         updatedAt: true,
+        analysis: true,
+        similarityScore: true,
+
+        document: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -131,11 +163,27 @@ export class ReportControllerBase {
     try {
       return await this.service.updateReport({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          document: data.document
+            ? {
+                connect: data.document,
+              }
+            : undefined,
+        },
         select: {
           id: true,
           createdAt: true,
           updatedAt: true,
+          analysis: true,
+          similarityScore: true,
+
+          document: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -169,6 +217,14 @@ export class ReportControllerBase {
           id: true,
           createdAt: true,
           updatedAt: true,
+          analysis: true,
+          similarityScore: true,
+
+          document: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {

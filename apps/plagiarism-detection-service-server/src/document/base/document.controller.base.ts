@@ -29,6 +29,9 @@ import { DocumentUpdateInput } from "./DocumentUpdateInput";
 import { AnalysisResultFindManyArgs } from "../../analysisResult/base/AnalysisResultFindManyArgs";
 import { AnalysisResult } from "../../analysisResult/base/AnalysisResult";
 import { AnalysisResultWhereUniqueInput } from "../../analysisResult/base/AnalysisResultWhereUniqueInput";
+import { ReportFindManyArgs } from "../../report/base/ReportFindManyArgs";
+import { Report } from "../../report/base/Report";
+import { ReportWhereUniqueInput } from "../../report/base/ReportWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -60,6 +63,10 @@ export class DocumentControllerBase {
         title: true,
         content: true,
         uploadedAt: true,
+        uploadedBy: true,
+        documentContent: true,
+        uploadedByUser: true,
+        documentTitle: true,
       },
     });
   }
@@ -87,6 +94,10 @@ export class DocumentControllerBase {
         title: true,
         content: true,
         uploadedAt: true,
+        uploadedBy: true,
+        documentContent: true,
+        uploadedByUser: true,
+        documentTitle: true,
       },
     });
   }
@@ -115,6 +126,10 @@ export class DocumentControllerBase {
         title: true,
         content: true,
         uploadedAt: true,
+        uploadedBy: true,
+        documentContent: true,
+        uploadedByUser: true,
+        documentTitle: true,
       },
     });
     if (result === null) {
@@ -152,6 +167,10 @@ export class DocumentControllerBase {
           title: true,
           content: true,
           uploadedAt: true,
+          uploadedBy: true,
+          documentContent: true,
+          uploadedByUser: true,
+          documentTitle: true,
         },
       });
     } catch (error) {
@@ -188,6 +207,10 @@ export class DocumentControllerBase {
           title: true,
           content: true,
           uploadedAt: true,
+          uploadedBy: true,
+          documentContent: true,
+          uploadedByUser: true,
+          documentTitle: true,
         },
       });
     } catch (error) {
@@ -292,6 +315,109 @@ export class DocumentControllerBase {
   ): Promise<void> {
     const data = {
       analysisResults: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateDocument({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/reports")
+  @ApiNestedQuery(ReportFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Report",
+    action: "read",
+    possession: "any",
+  })
+  async findReports(
+    @common.Req() request: Request,
+    @common.Param() params: DocumentWhereUniqueInput
+  ): Promise<Report[]> {
+    const query = plainToClass(ReportFindManyArgs, request.query);
+    const results = await this.service.findReports(params.id, {
+      ...query,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        analysis: true,
+        similarityScore: true,
+
+        document: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/reports")
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "update",
+    possession: "any",
+  })
+  async connectReports(
+    @common.Param() params: DocumentWhereUniqueInput,
+    @common.Body() body: ReportWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      reports: {
+        connect: body,
+      },
+    };
+    await this.service.updateDocument({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/reports")
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "update",
+    possession: "any",
+  })
+  async updateReports(
+    @common.Param() params: DocumentWhereUniqueInput,
+    @common.Body() body: ReportWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      reports: {
+        set: body,
+      },
+    };
+    await this.service.updateDocument({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/reports")
+  @nestAccessControl.UseRoles({
+    resource: "Document",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectReports(
+    @common.Param() params: DocumentWhereUniqueInput,
+    @common.Body() body: ReportWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      reports: {
         disconnect: body,
       },
     };
