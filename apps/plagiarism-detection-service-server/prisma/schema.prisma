@@ -1,0 +1,42 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Document {
+  id              String           @id @default(cuid())
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  title           String?
+  content         String?
+  uploadedAt      DateTime?
+  analysisResults AnalysisResult[]
+}
+
+model AnalysisResult {
+  id         String    @id @default(cuid())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  result     Json?
+  document   Document? @relation(fields: [documentId], references: [id])
+  documentId String?
+}
+
+model Algorithm {
+  id          String    @id @default(cuid())
+  description String?
+  createdAt   DateTime?
+  name        String?
+}
+
+model User {
+  id        String  @id @default(cuid())
+  firstName String?
+  lastName  String?
+  email     String?
+  password  String?
+}
