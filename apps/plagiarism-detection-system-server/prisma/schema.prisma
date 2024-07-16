@@ -1,0 +1,61 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Document {
+  id               String            @id @default(cuid())
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  title            String?
+  content          String?
+  author           String?
+  similarityChecks SimilarityCheck[]
+  analysisResults  AnalysisResult[]
+  user             User?             @relation(fields: [userId], references: [id])
+  userId           String?
+  documentContent  String?
+  documentTitle    String?
+  documentAuthor   String?
+}
+
+model AnalysisResult {
+  id               String            @id @default(cuid())
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  score            Float?
+  checkedAt        DateTime?
+  summary          String?
+  document         Document?         @relation(fields: [documentId], references: [id])
+  documentId       String?
+  similarityChecks SimilarityCheck[]
+}
+
+model SimilarityCheck {
+  id               String          @id @default(cuid())
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  similarityScore  Float?
+  checkDate        DateTime?
+  document         Document?       @relation(fields: [documentId], references: [id])
+  documentId       String?
+  analysisResult   AnalysisResult? @relation(fields: [analysisResultId], references: [id])
+  analysisResultId String?
+}
+
+model User {
+  id        String     @id @default(cuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  firstName String?
+  lastName  String?
+  username  String     @unique
+  email     String?    @unique
+  password  String
+  roles     Json
+  documents Document[]
+}
